@@ -21,7 +21,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/yourusername/dicomhawk.git
+    git clone https://github.com/gtheodoridis/DICOMHawk.git
     cd dicomhawk
     ```
 
@@ -43,7 +43,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
 
 1. **Access the Web Interface**:
 
-    Open a web browser and go to `http://localhost:5000` to access the DICOMHawk web interface. Here, you can monitor server status, view active associations, and check the logs.
+    Open a web browser and go to `http://127.0.0.1:5000` to access the DICOMHawk web interface. Here, you can monitor server status, view active associations, and check the logs.
 
 2. **Test the DICOM Server**:
 
@@ -52,7 +52,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
     - **C-ECHO (DICOM Echo Test)**:
 
         ```bash
-        echoscu localhost 11112
+        echoscu 127.0.0.1 11112
         ```
 
     - **C-FIND (DICOM Find Test)**:
@@ -67,7 +67,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
         Run the C-FIND command:
 
         ```bash
-        findscu -v -S -k QueryRetrieveLevel=STUDY -k PatientName=Doe^John localhost 11112
+        findscu -v -S -k QueryRetrieveLevel=STUDY -k PatientName=Doe^John 127.0.0.1 11112
         ```
 
     - **C-STORE (DICOM Store Test)**:
@@ -75,7 +75,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
         To send a DICOM file to the server, use the `storescu` command:
 
         ```bash
-        storescu localhost 11112 path/to/your/file.dcm
+        storescu 127.0.0.1 11112 path/to/your/file.dcm
         ```
 
 ### Development
