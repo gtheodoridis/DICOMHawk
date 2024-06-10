@@ -13,3 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
             logsPre.textContent = data;
         });
 });
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     console.log("Logs page loaded.");
+// });
