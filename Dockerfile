@@ -21,7 +21,7 @@ EXPOSE 11112
 EXPOSE 5000
 
 # Define environment variable
-ENV FLASK_APP dicompypot.py
+ENV FLASK_APP dicomhawk.py
 
 # Run the application using Gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "dicompypot:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "dicomhawk:app"]

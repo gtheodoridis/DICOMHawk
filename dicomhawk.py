@@ -17,53 +17,58 @@ import os
 from datetime import datetime
 import json
 import time
+import random
 
 # Set up logging
-log_file_path = 'logs/dicom_server.log'
-simplified_log_file_path = 'simplified_logs/dicom_simplified.log'
-exception_log_file_path = 'logs/exception.log'
+log_directory = '/app/logs'
+simplified_log_directory = '/app/simplified_logs'
 
-os.makedirs('logs', exist_ok=True)
-os.makedirs('simplified_logs', exist_ok=True)
+log_file_path = os.path.join(log_directory, 'dicom_server.log')
+simplified_log_file_path = os.path.join(simplified_log_directory, 'dicom_simplified.log')
+exception_log_file_path = os.path.join(log_directory, 'exception.log')
 
-# Detailed logger
-handler = TimedRotatingFileHandler(log_file_path, when="midnight", interval=1)
-handler.suffix = "%Y%m%d"
-detailed_logger = logging.getLogger('detailed_logger')
-detailed_logger.setLevel(logging.INFO)
-detailed_logger.addHandler(handler)
-detailed_logger.addHandler(logging.StreamHandler())
+os.makedirs(log_directory, exist_ok=True)
+os.makedirs(simplified_log_directory, exist_ok=True)
 
-# Simplified logger
-simplified_handler = TimedRotatingFileHandler(simplified_log_file_path, when="midnight", interval=1)
-simplified_handler.suffix = "%Y%m%d"
-simplified_logger = logging.getLogger('simplified_logger')
-simplified_logger.setLevel(logging.INFO)
-simplified_logger.addHandler(simplified_handler)
-simplified_logger.addHandler(logging.StreamHandler())
+# Logger setup function
+def setup_logger(name, log_file, level=logging.INFO, when="midnight", interval=1):
+    handler = TimedRotatingFileHandler(log_file, when=when, interval=interval)
+    handler.suffix = "%Y%m%d"
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+    logger.addHandler(logging.StreamHandler())
+    return logger
 
-# Exception logger
-exception_handler = TimedRotatingFileHandler(exception_log_file_path, when="midnight", interval=1)
-exception_handler.suffix = "%Y%m%d"
-exception_logger = logging.getLogger('exception_logger')
-exception_logger.setLevel(logging.ERROR)
-exception_logger.addHandler(exception_handler)
-exception_logger.addHandler(logging.StreamHandler())
+detailed_logger = setup_logger('detailed_logger', log_file_path, logging.DEBUG)
+simplified_logger = setup_logger('simplified_logger', simplified_log_file_path)
+exception_logger = setup_logger('exception_logger', exception_log_file_path, logging.ERROR)
+
+# Configure pynetdicom debug logging to use the detailed logger
+debug_logger()
+
+# Ensure that pynetdicom messages are captured
+pynetdicom_logger = logging.getLogger('pynetdicom')
+pynetdicom_logger.setLevel(logging.DEBUG)
+pynetdicom_logger.addHandler(logging.FileHandler(log_file_path))
 
 # Function to log valid JSON messages
 def log_simplified_message(message):
     try:
+        if message.get("event") == "Created fake DICOM file":
+            return
         json_message = json.dumps(message)
         simplified_logger.info(json_message)
     except (TypeError, ValueError) as e:
         exception_logger.error(f"Failed to log simplified message: {message} - {e}")
 
-# Enable pynetdicom's debug logging
-debug_logger()
-
-# Function to generate fake DICOM files
-def create_fake_dicom_files(directory, num_files=5):
+# Function to generate fake DICOM files with Danish-like names
+def create_fake_dicom_files(directory, num_files=10):
     os.makedirs(directory, exist_ok=True)
+    
+    first_names = ["Frederik", "Sofie", "Lukas", "Emma", "William", "Ida", "Noah", "Anna", "Oliver", "Laura"]
+    last_names = ["Jensen", "Nielsen", "Hansen", "Pedersen", "Andersen", "Christensen", "Larsen", "Sørensen", "Rasmussen", "Jørgensen"]
+    
     for i in range(num_files):
         filename = os.path.join(directory, f"test_file{i+1}.dcm")
         file_meta = Dataset()
@@ -73,7 +78,7 @@ def create_fake_dicom_files(directory, num_files=5):
         file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
 
         ds = FileDataset(filename, {}, file_meta=file_meta, preamble=b"\0" * 128)
-        ds.PatientName = f"Test^Patient{i+1}"
+        ds.PatientName = f"{random.choice(first_names)}^{random.choice(last_names)}"
         ds.PatientID = f"{i+1}"
         ds.StudyInstanceUID = generate_uid()
         ds.SeriesInstanceUID = generate_uid()
@@ -125,16 +130,22 @@ def load_dicom_files(directory):
     return dicom_files
 
 dicom_directory = 'dicom_files'
-create_fake_dicom_files(dicom_directory)
+if not os.path.exists(dicom_directory):
+    create_fake_dicom_files(dicom_directory)
 dicom_datasets = load_dicom_files(dicom_directory)
+
+# Dictionary to store association session IDs
+assoc_sessions = {}
 
 def handle_assoc(event):
     assoc_id = str(int(time.time() * 1000000))
+    assoc_sessions[event.assoc] = assoc_id
     detailed_logger.info(f"Association requested from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
     
     version = event.assoc.requestor.implementation_version_name if event.assoc.requestor.implementation_version_name else "N/A"
     
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": assoc_id,
         "event": "Association requested",
         "IP": event.assoc.requestor.address,
@@ -144,6 +155,7 @@ def handle_assoc(event):
         "timestamp": datetime.now().isoformat()
     })
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": assoc_id,
         "Version": version,
         "level": "info",
@@ -152,10 +164,11 @@ def handle_assoc(event):
     })
 
 def handle_release(event):
-    release_id = str(int(time.time() * 1000000))
+    assoc_id = assoc_sessions.pop(event.assoc, str(int(time.time() * 1000000)))
     detailed_logger.info(f"Association released from {event.assoc.requestor.address}:{event.assoc.requestor.port}")
     log_simplified_message({
-        "ID": release_id,
+        "session_id": assoc_id,
+        "ID": assoc_id,
         "event": "Association released",
         "IP": event.assoc.requestor.address,
         "Port": event.assoc.requestor.port,
@@ -166,14 +179,17 @@ def handle_release(event):
     })
 
 def handle_find(event):
+    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     find_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-FIND request received: {event.identifier}")
-    
-    # Log the C-FIND Search term and type
+
+    # Convert PatientName to string for JSON serialization
+    term = None
     for elem in event.identifier:
         if elem.VR == 'PN' and elem.keyword == 'PatientName':
             term = str(elem.value)
             log_simplified_message({
+                "session_id": assoc_id,
                 "ID": find_id,
                 "Term": term,
                 "Type": "PatientName",
@@ -184,40 +200,43 @@ def handle_find(event):
             break
 
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": find_id,
         "event": "C-FIND request received",
         "Command": "C-FIND",
-        "identifier": str(event.identifier),
+        "identifier": {tag: str(value) for tag, value in event.identifier.items()},
         "level": "info",
         "msg": "Received",
         "timestamp": datetime.now().isoformat()
     })
 
-    # Create a response dataset and log the number of matches
-    matches = 1  # For simplicity, we are assuming 1 match in this example
+    matches = 0
+    for path, ds in dicom_datasets.items():
+        if term is None or ds.PatientName == term or term == '*':
+            matches += 1
+            yield 0xFF00, ds
+
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": find_id,
         "Matches": matches,
         "level": "warning",
         "msg": "C-FIND Search result",
         "timestamp": datetime.now().isoformat()
     })
-    
-    ds = Dataset()
-    ds.PatientName = "Doe^John"
-    ds.PatientID = "12345"
-    ds.StudyDate = "20210101"
-    ds.QueryRetrieveLevel = "STUDY"
-    yield 0xFF00, ds
+
+
 
 def handle_store(event):
+    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     store_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-STORE request received: {event.dataset}")
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": store_id,
         "event": "C-STORE request received",
         "Command": "C-STORE",
-        "dataset": str(event.dataset),
+        "dataset": {tag: str(value) for tag, value in event.dataset.items()},
         "level": "info",
         "msg": "Received",
         "timestamp": datetime.now().isoformat()
@@ -225,9 +244,11 @@ def handle_store(event):
     return 0x0000
 
 def handle_echo(event):
+    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     echo_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-ECHO request received")
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": echo_id,
         "event": "C-ECHO request received",
         "Command": "C-ECHO",
@@ -238,13 +259,15 @@ def handle_echo(event):
     return 0x0000
 
 def handle_move(event):
+    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     move_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-MOVE request received: {event.identifier}")
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": move_id,
         "event": "C-MOVE request received",
         "Command": "C-MOVE",
-        "identifier": str(event.identifier),
+        "identifier": {tag: str(value) for tag, value in event.identifier.items()},
         "level": "info",
         "msg": "Received",
         "timestamp": datetime.now().isoformat()
@@ -259,22 +282,29 @@ def handle_move(event):
     yield 1, ds
 
 def handle_get(event):
+    assoc_id = assoc_sessions.get(event.assoc, str(int(time.time() * 1000000)))
     get_id = str(int(time.time() * 1000000))
     detailed_logger.info(f"C-GET request received: {event.identifier}")
     log_simplified_message({
+        "session_id": assoc_id,
         "ID": get_id,
         "event": "C-GET request received",
         "Command": "C-GET",
-        "identifier": str(event.identifier),
+        "identifier": {tag: str(value) for tag, value in event.identifier.items()},
         "level": "info",
         "msg": "Received",
         "timestamp": datetime.now().isoformat()
     })
     remaining_subops = len(dicom_datasets)
+    
+    # Yield the number of remaining sub-operations as the first item
+    yield remaining_subops
+    
     for path, ds in dicom_datasets.items():
         yield remaining_subops, ds
         remaining_subops -= 1
     yield 0
+
 
 handlers = [
     (evt.EVT_ACSE_RECV, handle_assoc),
@@ -306,6 +336,10 @@ dicom_thread.start()
 app = Flask(__name__)
 
 @app.route('/')
+def landing_page():
+    return render_template('landing.html')
+
+@app.route('/home')
 def home():
     return render_template('status.html')
 
@@ -323,8 +357,8 @@ def all_logs():
         if not os.path.exists(log_file_path):
             return jsonify({"error": "Log file does not exist"}), 404
         with open(log_file_path, 'r') as f:
-            log_content = f.read()
-        return log_content
+            log_content = f.read().replace('\n', '<br>')
+        return f"<pre>{log_content}</pre>"
     except Exception as e:
         exception_logger.error(f"Error reading log file: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
@@ -333,7 +367,7 @@ def all_logs():
 def simplified_logs():
     try:
         if not os.path.exists(simplified_log_file_path):
-            return jsonify({"error": "Log file does not exist"}), 404
+            return jsonify([])  # Return an empty list if the log file does not exist
         log_entries = []
         with open(simplified_log_file_path, 'r') as f:
             for line in f:
@@ -347,7 +381,7 @@ def simplified_logs():
         return jsonify(log_entries)
     except Exception as e:
         exception_logger.error(f"Error reading simplified log file: {e}")
-        return jsonify({"error": "Internal Server Error"}), 500
+        return jsonify([])  # Return an empty list in case of error
 
 @app.route('/logs/simplified_page')
 def simplified_logs_page():
@@ -356,6 +390,11 @@ def simplified_logs_page():
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory('static', 'favicon.ico')
+
+@app.errorhandler(404)
+def not_found(e):
+    # Do not log 404 errors
+    return jsonify({"error": "Not Found"}), 404
 
 @app.errorhandler(Exception)
 def handle_exception(e):
