@@ -1,88 +1,98 @@
-Created fake DICOM file: dicom_files\test_file1.dcm
-Created fake DICOM file: dicom_files\test_file2.dcm
-Created fake DICOM file: dicom_files\test_file3.dcm
-Created fake DICOM file: dicom_files\test_file4.dcm
-Created fake DICOM file: dicom_files\test_file5.dcm
-Association requested from 127.0.0.1:17275
+Request Parameters:
+======================= INCOMING A-ASSOCIATE-RQ PDU ========================
+Their Implementation Class UID:      1.2.276.0.7230010.3.0.3.6.8
+Their Implementation Version Name:   OFFIS_DCMTK_368
+Application Context Name:    1.2.840.10008.3.1.1.1
+Calling Application Name:    ECHOSCU
+Called Application Name:     ANY-SCP
+Their Max PDU Receive Size:  16384
+Presentation Context:
+  Context ID:        1 (Proposed)
+    Abstract Syntax: =Verification SOP Class
+    Proposed SCP/SCU Role: Default
+    Proposed Transfer Syntax:
+      =Implicit VR Little Endian
+Requested Extended Negotiation: None
+Requested Common Extended Negotiation: None
+Requested Asynchronous Operations Window Negotiation: None
+Requested User Identity Negotiation: None
+========================== END A-ASSOCIATE-RQ PDU ==========================
+Association requested from 127.0.0.1:13887
+Accepting Association
+Accept Parameters:
+======================= OUTGOING A-ASSOCIATE-AC PDU ========================
+Our Implementation Class UID:      1.2.826.0.1.3680043.9.3811.2.0.2
+Our Implementation Version Name:   PYNETDICOM_202
+Application Context Name:    1.2.840.10008.3.1.1.1
+Responding Application Name: resp. AE Title
+Our Max PDU Receive Size:    16382
+Presentation Contexts:
+  Context ID:        1 (Accepted)
+    Abstract Syntax: =Verification SOP Class
+    Accepted SCP/SCU Role: Default
+    Accepted Transfer Syntax: =Implicit VR Little Endian
+Accepted Extended Negotiation: None
+Accepted Asynchronous Operations Window Negotiation: None
+User Identity Negotiation Response: None
+========================== END A-ASSOCIATE-AC PDU ==========================
+pydicom.read_dataset() TransferSyntax="Little Endian Implicit"
+Received Echo Request (MsgID 1)
+========================== INCOMING DIMSE MESSAGE ==========================
+Message Type                  : C-ECHO RQ
+Presentation Context ID       : 1
+Message ID                    : 1
+Data Set                      : None
+============================ END DIMSE MESSAGE =============================
 C-ECHO request received
-Association requested from 127.0.0.1:17275
-Association released from 127.0.0.1:17275
-Created fake DICOM file: dicom_files\test_file1.dcm
-Created fake DICOM file: dicom_files\test_file2.dcm
-Created fake DICOM file: dicom_files\test_file3.dcm
-Created fake DICOM file: dicom_files\test_file4.dcm
-Created fake DICOM file: dicom_files\test_file5.dcm
-Association requested from 127.0.0.1:17308
+Association requested from 127.0.0.1:13887
+Association Released
+Association released from 127.0.0.1:13887
+Request Parameters:
+======================= INCOMING A-ASSOCIATE-RQ PDU ========================
+Their Implementation Class UID:      1.2.276.0.7230010.3.0.3.6.8
+Their Implementation Version Name:   OFFIS_DCMTK_368
+Application Context Name:    1.2.840.10008.3.1.1.1
+Calling Application Name:    ECHOSCU
+Called Application Name:     ANY-SCP
+Their Max PDU Receive Size:  16384
+Presentation Context:
+  Context ID:        1 (Proposed)
+    Abstract Syntax: =Verification SOP Class
+    Proposed SCP/SCU Role: Default
+    Proposed Transfer Syntax:
+      =Implicit VR Little Endian
+Requested Extended Negotiation: None
+Requested Common Extended Negotiation: None
+Requested Asynchronous Operations Window Negotiation: None
+Requested User Identity Negotiation: None
+========================== END A-ASSOCIATE-RQ PDU ==========================
+Association requested from 127.0.0.1:13964
+Accepting Association
+Accept Parameters:
+======================= OUTGOING A-ASSOCIATE-AC PDU ========================
+Our Implementation Class UID:      1.2.826.0.1.3680043.9.3811.2.0.2
+Our Implementation Version Name:   PYNETDICOM_202
+Application Context Name:    1.2.840.10008.3.1.1.1
+Responding Application Name: resp. AE Title
+Our Max PDU Receive Size:    16382
+Presentation Contexts:
+  Context ID:        1 (Accepted)
+    Abstract Syntax: =Verification SOP Class
+    Accepted SCP/SCU Role: Default
+    Accepted Transfer Syntax: =Implicit VR Little Endian
+Accepted Extended Negotiation: None
+Accepted Asynchronous Operations Window Negotiation: None
+User Identity Negotiation Response: None
+========================== END A-ASSOCIATE-AC PDU ==========================
+pydicom.read_dataset() TransferSyntax="Little Endian Implicit"
+Received Echo Request (MsgID 1)
+========================== INCOMING DIMSE MESSAGE ==========================
+Message Type                  : C-ECHO RQ
+Presentation Context ID       : 1
+Message ID                    : 1
+Data Set                      : None
+============================ END DIMSE MESSAGE =============================
 C-ECHO request received
-Association requested from 127.0.0.1:17308
-Association released from 127.0.0.1:17308
-Association requested from 127.0.0.1:17318
-C-FIND request received: (0010, 0010) Patient's Name                      PN: '*'
-Association requested from 127.0.0.1:17318
-Association released from 127.0.0.1:17318
-Association requested from 127.0.0.1:17325
-C-GET request received: (0010, 0010) Patient's Name                      PN: '*'
-Association requested from 127.0.0.1:17325
-Association released from 127.0.0.1:17325
-Association requested from 127.0.0.1:17387
-Association requested from 127.0.0.1:17387
-Association requested from 127.0.0.1:17409
-Association requested from 127.0.0.1:17409
-Created fake DICOM file: dicom_files\test_file1.dcm
-Created fake DICOM file: dicom_files\test_file2.dcm
-Created fake DICOM file: dicom_files\test_file3.dcm
-Created fake DICOM file: dicom_files\test_file4.dcm
-Created fake DICOM file: dicom_files\test_file5.dcm
-Association requested from 127.0.0.1:17435
-Association requested from 127.0.0.1:17435
-Association requested from 127.0.0.1:17436
-C-STORE request received: (0008, 0016) SOP Class UID                       UI: CT Image Storage
-(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.68188442645916642940825739231047867306
-(0008, 0020) Study Date                          DA: '20240610'
-(0008, 0023) Content Date                        DA: '20240610'
-(0008, 0030) Study Time                          TM: '164022'
-(0008, 0033) Content Time                        TM: '164022'
-(0008, 0060) Modality                            CS: 'CT'
-(0010, 0010) Patient's Name                      PN: 'Test^Patient'
-(0010, 0020) Patient ID                          LO: '123456'
-(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.60013818606444100846061288182309174404
-(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.12320532273602271510381791664072957389
-(0028, 0002) Samples per Pixel                   US: 1
-(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
-(0028, 0010) Rows                                US: 512
-(0028, 0011) Columns                             US: 512
-(0028, 0100) Bits Allocated                      US: 16
-(0028, 0101) Bits Stored                         US: 12
-(0028, 0102) High Bit                            US: 11
-(0028, 0103) Pixel Representation                US: 0
-(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
-Association requested from 127.0.0.1:17436
-Association released from 127.0.0.1:17436
-Association requested from 127.0.0.1:17464
-C-STORE request received: (0008, 0016) SOP Class UID                       UI: CT Image Storage
-(0008, 0018) SOP Instance UID                    UI: 1.2.826.0.1.3680043.8.498.26851225619652605436855431648461323652
-(0008, 0020) Study Date                          DA: '20240610'
-(0008, 0023) Content Date                        DA: '20240610'
-(0008, 0030) Study Time                          TM: '164202'
-(0008, 0033) Content Time                        TM: '164202'
-(0008, 0060) Modality                            CS: 'CT'
-(0010, 0010) Patient's Name                      PN: 'Test^Patient'
-(0010, 0020) Patient ID                          LO: '123456'
-(0020, 000d) Study Instance UID                  UI: 1.2.826.0.1.3680043.8.498.81724060277844952476019459535692946523
-(0020, 000e) Series Instance UID                 UI: 1.2.826.0.1.3680043.8.498.13356648179801660732727644135631046539
-(0028, 0002) Samples per Pixel                   US: 1
-(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
-(0028, 0010) Rows                                US: 512
-(0028, 0011) Columns                             US: 512
-(0028, 0100) Bits Allocated                      US: 16
-(0028, 0101) Bits Stored                         US: 12
-(0028, 0102) High Bit                            US: 11
-(0028, 0103) Pixel Representation                US: 0
-(7fe0, 0010) Pixel Data                          OW: Array of 524288 elements
-Association requested from 127.0.0.1:17464
-Association released from 127.0.0.1:17464
-Created fake DICOM file: dicom_files\test_file1.dcm
-Created fake DICOM file: dicom_files\test_file2.dcm
-Created fake DICOM file: dicom_files\test_file3.dcm
-Created fake DICOM file: dicom_files\test_file4.dcm
-Created fake DICOM file: dicom_files\test_file5.dcm
+Association requested from 127.0.0.1:13964
+Association Released
+Association released from 127.0.0.1:13964
