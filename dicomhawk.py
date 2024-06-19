@@ -12,8 +12,8 @@ from pynetdicom.sop_class import (
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import generate_uid, ExplicitVRLittleEndian, PYDICOM_IMPLEMENTATION_UID
 import pydicom
-import threading
 import os
+import socket
 from datetime import datetime
 import json
 import time
@@ -326,12 +326,16 @@ ae.add_supported_context(Verification)
 for context in StoragePresentationContexts + VerificationPresentationContexts + QueryRetrievePresentationContexts:
     ae.add_supported_context(context.abstract_syntax)
 
-def start_dicom_server():
-    ae.start_server(('0.0.0.0', 11112), evt_handlers=handlers)
+def is_port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('0.0.0.0', port)) == 0
 
-dicom_thread = threading.Thread(target=start_dicom_server)
-dicom_thread.daemon = True
-dicom_thread.start()
+def start_dicom_server():
+    dicom_port = 11112
+    if is_port_in_use(dicom_port):
+        print(f"Port {dicom_port} is in use. Please free up the port and try again.")
+        return
+    ae.start_server(('0.0.0.0', dicom_port), evt_handlers=handlers)
 
 app = Flask(__name__)
 
@@ -402,4 +406,5 @@ def handle_exception(e):
     return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == "__main__":
+    start_dicom_server()
     app.run(port=5000)
