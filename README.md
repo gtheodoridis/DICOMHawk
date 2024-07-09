@@ -69,7 +69,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
         Run the C-FIND command:
 
         ```bash
-        findscu -v -S -k QueryRetrieveLevel=STUDY -k PatientName=Doe^John 127.0.0.1 11112
+        findscu -v -S -k QueryRetrieveLevel=STUDY -k PatientName=Frodo^Baggins 127.0.0.1 11112
         ```
 
     - **C-STORE (DICOM Store Test)**:
