@@ -47,7 +47,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
 
     Open a web browser and go to `http://127.0.0.1:5000` to access the DICOMHawk web interface. Here, you can monitor server status, view active associations, and check the logs.
 
-    ![DICOMHawk Web Interface](images/screenshots.png)
+    ![DICOMHawk Web Interface](images/interface_screenshots.png)
 
 2. **Test the DICOM Server**:
 
