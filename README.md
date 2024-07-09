@@ -39,13 +39,15 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
     docker run -d -p 5000:5000 -p 11112:11112 --name dicomhawk_container dicomhawk
     ```
 
-    This command runs the container in detached mode, exposing the web interface on port 5000 and the DICOM server on port 11112.
+    This command runs the container in detached mode, exposing the web interface on port 5000 and the DICOM server on port 11112. Alternatively, port 104 is also applicable for DICOM (ACR-NEMA).
 
 ### Usage
 
 1. **Access the Web Interface**:
 
     Open a web browser and go to `http://127.0.0.1:5000` to access the DICOMHawk web interface. Here, you can monitor server status, view active associations, and check the logs.
+
+    ![DICOMHawk Web Interface](images/screenshots.png)
 
 2. **Test the DICOM Server**:
 
@@ -63,13 +65,13 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
 
         ```plaintext
         (0008,0052) CS [STUDY]                            # QueryRetrieveLevel
-        (0010,0010) PN [Doe^John]                         # Patient's Name
+        (0010,0010) PN [Baggins^Frodo]                         # Patient's Name
         ```
 
         Run the C-FIND command:
 
         ```bash
-        findscu -v -S -k QueryRetrieveLevel=STUDY -k PatientName=Frodo^Baggins 127.0.0.1 11112
+        findscu -v -S -k QueryRetrieveLevel=STUDY -k PatientName=Baggins^Frodo 127.0.0.1 11112
         ```
 
     - **C-STORE (DICOM Store Test)**:
