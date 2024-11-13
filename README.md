@@ -15,7 +15,7 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
 
 ### Prerequisites
 
-- Docker installed on your machine
+- Docker and Docker Compose installed on your machine
 - DCMTK tools installed on your local machine for testing
 
 ### Installation
@@ -27,19 +27,13 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
     cd dicomhawk
     ```
 
-2. **Build the Docker image**:
+2. **Start the services with Docker Compose**:
 
     ```bash
-    docker build -t dicomhawk .
+    docker-compose up -d
     ```
 
-3. **Run the Docker container**:
-
-    ```bash
-    docker run -d -p 5000:5000 -p 11112:11112 --name dicomhawk_container dicomhawk
-    ```
-
-    This command runs the container in detached mode, exposing the web interface on port 5000 and the DICOM server on port 11112. Alternatively, port 104 is also applicable for DICOM (ACR-NEMA).
+    This command starts the Flask application and a log server in detached mode. The web interface is accessible on port 5000, and the DICOM server listens on port 11112. Alternatively, port 104 is also applicable for DICOM (ACR-NEMA).
 
 ### Usage
 
@@ -84,21 +78,12 @@ DICOMHawk is a powerful and efficient honeypot for DICOM servers, designed to at
 
 ### Development
 
-If you want to make changes to DICOMHawk or extend its functionality, you can do so by modifying the source code. Once you've made your changes, rebuild the Docker image and restart the container:
+If you want to make changes to DICOMHawk or extend its functionality, modify the source code, then restart the services:
 
-1. **Rebuild the Docker image**:
-
-    ```bash
-    docker build -t dicomhawk .
-    ```
-
-2. **Restart the Docker container**:
-
-    ```bash
-    docker stop dicomhawk_container
-    docker rm dicomhawk_container
-    docker run -d -p 5000:5000 -p 11112:11112 --name dicomhawk_container dicomhawk
-    ```
+```bash
+docker-compose down
+docker-compose up -d
+```
 
 ### Logs and Monitoring
 
@@ -107,7 +92,11 @@ DICOMHawk provides detailed logging to help you monitor and analyze interactions
 - **Server Logs**: Access logs to see detailed information about DICOM associations and DIMSE messages.
 - **Simplified Logs**: View simplified logs for a quick overview of events.
 
-You can view these logs through the web interface or by accessing the log files directly within the Docker container.
+You can view these logs through the web interface or by accessing the log files directly within the log server container.
+
+```bash
+docker-compose logs logserver
+```
 
 ### Troubleshooting
 
@@ -117,4 +106,9 @@ You can view these logs through the web interface or by accessing the log files 
 For more detailed troubleshooting, check the Docker container logs:
 
 ```bash
-docker logs dicomhawk_container
+docker-compose logs
+```
+
+### License
+
+DICOMHawk is open-source software released under the MIT License. See the LICENSE file for more details.
